@@ -1,0 +1,57 @@
+---
+title: "Unsupervised Learning"
+author: "Raghav Agrawal"
+date: "2023-10-05"
+categories: [unsupervised, k-means, ml]
+---
+
+This is the first post in a Quarto blog. Welcome!
+
+![](thumbnail.jpg)
+
+Since this post doesn't specify an explicit `image`, the first image in the post will be used in the listing page of posts.
+
+```{python}
+# Importing Necessary Libraries
+import numpy as np 
+import pandas as pd 
+import matplotlib.pyplot as plt 
+%matplotlib inline
+
+# Load the Universal Bank Data
+df = pd.read_csv('bank.csv')
+df.head()
+
+
+df1 = df.drop(["ID","ZIP Code"], axis = 1)
+df1.head()
+
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+scaled = scaler.fit(df1.drop('CreditCard',axis=1)).transform(df1.drop('CreditCard',axis=1))
+df_scaled = pd.DataFrame(scaled, columns=df1.columns[:-1])
+df_scaled.head()
+
+x = df_scaled
+y = df1['CreditCard']
+
+# Split the dataset into train and test sections
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=0)
+
+
+from sklearn.cluster import KMeans
+#from sklearn.metrics import silhouette_scor
+
+kmeans = KMeans(
+    init="random",
+    n_clusters=2,
+    n_init=10,
+    max_iter=300,
+    random_state=42
+)
+
+#kmeans.fit(x)
+label = kmeans.fit_predict(x)
+
+```
