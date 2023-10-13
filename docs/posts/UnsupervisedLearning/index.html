@@ -95,6 +95,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 <link rel="stylesheet" href="../../styles.css">
@@ -182,17 +185,320 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p>This is the first post in a Quarto blog. Welcome!</p>
-<p><img src="thumbnail.jpg" class="img-fluid"></p>
-<p>Since this post doesn’t specify an explicit <code>image</code>, the first image in the post will be used in the listing page of posts.</p>
+<p>Unsupervised learning is a type of machine learning where an algorithm is trained on a dataset without labeled outputs or target values. The primary goal of unsupervised learning is to discover the inherent structure or organization in the data. It can be used for various tasks, including:</p>
+<p><strong>Clustering</strong> : Unsupervised learning algorithms can group data points into clusters based on similarities or shared characteristics. K-means clustering and hierarchical clustering are common techniques used for this purpose.</p>
+<p><strong>Dimensionality Reduction</strong> : Unsupervised learning can reduce the dimensionality of data by extracting relevant features or reducing noise. Principal Component Analysis (PCA) and t-SNE (t-distributed Stochastic Neighbor Embedding) are examples of dimensionality reduction techniques.</p>
+<p><strong>Anomaly Detection</strong>: Unsupervised learning can identify unusual or rare data points, which may indicate anomalies or outliers in the dataset.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="unsupervised.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Unsupervised Learning</figcaption>
+</figure>
+</div>
+<p>Unsupervised learning is more exploratory in nature, as it doesn’t have specific target outcomes to achieve. It is commonly used in data analysis, pattern recognition, and data preprocessing to gain insights and structure from unlabelled data. Some of the most well-known unsupervised learning algorithms include:</p>
+<ol type="1">
+<li><p><strong>K-Means Clustering:</strong> K-Means is a popular clustering algorithm that divides data points into ‘k’ clusters based on their similarity. It aims to minimize the distance between data points and the center of their respective clusters.</p></li>
+<li><p><strong>Hierarchical Clustering:</strong> This algorithm creates a hierarchical representation of clusters, with a tree-like structure called a dendrogram. It can be used to visualize how data points are grouped at different levels of granularity.</p></li>
+<li><p><strong>DBSCAN (Density-Based Spatial Clustering of Applications with Noise):</strong> DBSCAN groups data points based on their density, identifying dense regions as clusters and separating sparse regions as noise. It is effective at handling clusters of varying shapes and sizes.</p></li>
+<li><p><strong>Principal Component Analysis (PCA):</strong> PCA is a dimensionality reduction technique that identifies orthogonal axes (principal components) along which the data exhibits the most variance. It helps reduce the dimensionality of the data while preserving as much information as possible.</p></li>
+<li><p><strong>Self-Organizing Maps (SOM):</strong> SOM is a neural network-based technique that maps high-dimensional data onto a grid of lower-dimensional nodes, preserving the topology of the data.</p></li>
+</ol>
+<p>These algorithms serve different purposes and are applied in a wide range of applications, from customer segmentation and image compression to outlier detection and data visualization. The choice of algorithm depends on the specific problem and the characteristics of the dataset you are working with.</p>
+<p>Now lets take an example of customer segmentation using K-means clustering.</p>
+<section id="customer-segmentation-with-k-means-cluster" class="level2">
+<h2 class="anchored" data-anchor-id="customer-segmentation-with-k-means-cluster">Customer Segmentation with K-means cluster</h2>
+<p>We have a dataset with customer information in a shopping mall. Using K-means clustering, we will try to find relationship between different attributes of a customer and how much they spend.</p>
+<p>First of all, let us import the necessary classes and load the dataset.</p>
 <div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"second blog"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> preprocessing</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> pd.read_csv(<span class="st">'Mall_Customers.csv'</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>db.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ID</th>
+<th data-quarto-table-cell-role="th">Gender</th>
+<th data-quarto-table-cell-role="th">Age</th>
+<th data-quarto-table-cell-role="th">Income (k$)</th>
+<th data-quarto-table-cell-role="th">Spending Score (1-100)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>Male</td>
+<td>19</td>
+<td>15</td>
+<td>39</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2</td>
+<td>Male</td>
+<td>21</td>
+<td>15</td>
+<td>81</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>3</td>
+<td>Female</td>
+<td>20</td>
+<td>16</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4</td>
+<td>Female</td>
+<td>23</td>
+<td>16</td>
+<td>77</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5</td>
+<td>Female</td>
+<td>31</td>
+<td>17</td>
+<td>40</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Since most of the data in our set is numeric, expect the <em>Gender</em>, let us convert that to a numeric value as well.</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>db[<span class="st">"Gender"</span>] <span class="op">=</span> db.<span class="bu">apply</span>(<span class="kw">lambda</span> x: <span class="bu">int</span>(<span class="dv">1</span>) <span class="cf">if</span> ((x[<span class="st">'Gender'</span>])<span class="op">==</span><span class="st">"Male"</span>) <span class="cf">else</span> <span class="bu">int</span>(<span class="dv">0</span>), axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>db.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>second blog</code></pre>
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 200 entries, 0 to 199
+Data columns (total 5 columns):
+ #   Column                  Non-Null Count  Dtype
+---  ------                  --------------  -----
+ 0   ID                      200 non-null    int64
+ 1   Gender                  200 non-null    int64
+ 2   Age                     200 non-null    int64
+ 3   Income (k$)             200 non-null    int64
+ 4   Spending Score (1-100)  200 non-null    int64
+dtypes: int64(5)
+memory usage: 7.9 KB</code></pre>
 </div>
 </div>
+<p>So there are 200 non-null observations and no categorical variables anymore. All good, now what I want is to cluster the customers, and for this I’ll firstly choose to keep a database that finds relationship between income and spendings.</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>income_db <span class="op">=</span> db.iloc[:,[<span class="dv">3</span>,<span class="dv">4</span>]]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>income_db.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div>
 
 
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Income (k$)</th>
+<th data-quarto-table-cell-role="th">Spending Score (1-100)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>15</td>
+<td>39</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>15</td>
+<td>81</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>16</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>16</td>
+<td>77</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>17</td>
+<td>40</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>The next step is to determine how many clusters are optimal; for this let’s use the Elbow method, testing number of clusters between 1 and 10.</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>cl <span class="op">=</span> []</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>list_k <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> list_k:</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>k)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    kmeans.fit(income_db)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    cl.append(kmeans.inertia_)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">6</span>))</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>plt.plot(list_k, cl, <span class="st">'-o'</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="vs">r'# Clusters'</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Sum of squared distance'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>Text(0, 0.5, 'Sum of squared distance')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-5-output-2.png" width="544" height="503"></p>
+</div>
+</div>
+<p>The idea behind the elbow method is to find a balance between minimizing the within-cluster variance (making clusters more homogeneous) and avoiding an excessive number of clusters that might overfit the data. The elbow point indicates the number of clusters at which the improvement in the chosen metric starts to slow down significantly, suggesting that adding more clusters does not yield much better clustering quality. The elbow of the graph is at 5, so let us create 5 clusters.</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">5</span>) </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>kmeans.fit(income_db)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>y_km <span class="op">=</span> kmeans.fit_predict(income_db)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>income_db <span class="op">=</span> np.array(income_db)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Clusters"</span>, fontsize<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Annual Income"</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Spending Score"</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>plt.scatter(income_db[y_km <span class="op">==</span><span class="dv">0</span>,<span class="dv">0</span>], income_db[y_km <span class="op">==</span> <span class="dv">0</span>,<span class="dv">1</span>], c<span class="op">=</span><span class="st">'red'</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>plt.scatter(income_db[y_km <span class="op">==</span><span class="dv">1</span>,<span class="dv">0</span>], income_db[y_km <span class="op">==</span> <span class="dv">1</span>,<span class="dv">1</span>], c<span class="op">=</span><span class="st">'black'</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>plt.scatter(income_db[y_km <span class="op">==</span><span class="dv">2</span>,<span class="dv">0</span>], income_db[y_km <span class="op">==</span> <span class="dv">2</span>,<span class="dv">1</span>],  c<span class="op">=</span><span class="st">'blue'</span>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>plt.scatter(income_db[y_km <span class="op">==</span><span class="dv">3</span>,<span class="dv">0</span>], income_db[y_km <span class="op">==</span> <span class="dv">3</span>,<span class="dv">1</span>],  c<span class="op">=</span><span class="st">'orange'</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>plt.scatter(income_db[y_km <span class="op">==</span><span class="dv">4</span>,<span class="dv">0</span>], income_db[y_km <span class="op">==</span> <span class="dv">4</span>,<span class="dv">1</span>],  c<span class="op">=</span><span class="st">'yellow'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>&lt;matplotlib.collections.PathCollection at 0x7efb8befb010&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-6-output-2.png" width="594" height="458"></p>
+</div>
+</div>
+<p><em>We can easily distinguish our five clusters. Based on this distinction, we can categorize our clients into the following groups: individuals with lower incomes fall into two categories, some of whom are frugal in their spending , while others are more extravagant. Similarly, those with higher incomes can be divided in a comparable manner: a cluster consists of individuals who maintain modest spending habits, while another cluster represents those who tend to spend liberally. Additionally, there is a middle category comprising individuals with moderate incomes who exhibit moderate spending levels.</em></p>
+<p>Now lets us try to find correlations between Gender and Spendings.</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>gender_db <span class="op">=</span> db.iloc[:,[<span class="dv">1</span>,<span class="dv">4</span>]]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>gender_db.head()</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>cl <span class="op">=</span> []</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>list_k <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> list_k:</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>k)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    kmeans.fit(gender_db)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    cl.append(kmeans.inertia_)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">6</span>))</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>plt.plot(list_k, cl, <span class="st">'-o'</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="vs">r'# Clusters'</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Sum of squared distance'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>Text(0, 0.5, 'Sum of squared distance')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-7-output-2.png" width="544" height="503"></p>
+</div>
+</div>
+<p><em>Since the elbow of the curve is at three now, let us form 3 clusters.</em></p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">3</span>) </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>kmeans.fit(gender_db)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>y_km <span class="op">=</span> kmeans.fit_predict(gender_db)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>gender_db <span class="op">=</span> np.array(gender_db)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Clusters"</span>, fontsize<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Gender"</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Spending Score"</span>)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>plt.scatter(gender_db[y_km <span class="op">==</span><span class="dv">0</span>,<span class="dv">0</span>], gender_db[y_km <span class="op">==</span> <span class="dv">0</span>,<span class="dv">1</span>], c<span class="op">=</span><span class="st">'red'</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>plt.scatter(gender_db[y_km <span class="op">==</span><span class="dv">1</span>,<span class="dv">0</span>], gender_db[y_km <span class="op">==</span> <span class="dv">1</span>,<span class="dv">1</span>], c<span class="op">=</span><span class="st">'black'</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>plt.scatter(gender_db[y_km <span class="op">==</span><span class="dv">2</span>,<span class="dv">0</span>], gender_db[y_km <span class="op">==</span> <span class="dv">2</span>,<span class="dv">1</span>],  c<span class="op">=</span><span class="st">'blue'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>&lt;matplotlib.collections.PathCollection at 0x7efc4c2bd3d0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-8-output-2.png" width="593" height="458"></p>
+</div>
+</div>
+<p>The data between Males and Females seem to be a uniform split, and hence we don’t get much imformation froom this cluster.</p>
+<p>Finally, let us try to find a relationship between Age and Spendings.</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>age_db <span class="op">=</span> db.iloc[:,[<span class="dv">2</span>,<span class="dv">4</span>]]</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>age_db.head()</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>cl <span class="op">=</span> []</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>list_k <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>))</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> list_k:</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>k)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    kmeans.fit(age_db)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    cl.append(kmeans.inertia_)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">6</span>))</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>plt.plot(list_k, cl, <span class="st">'-o'</span>)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="vs">r'# Clusters'</span>)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Sum of squared distance'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>Text(0, 0.5, 'Sum of squared distance')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-9-output-2.png" width="544" height="503"></p>
+</div>
+</div>
+<p>Now let us take 4 clusters.</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">4</span>) </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>kmeans.fit(age_db)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>y_km <span class="op">=</span> kmeans.fit_predict(age_db)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>age_db <span class="op">=</span> np.array(age_db)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Clusters"</span>, fontsize<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Gender"</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Spending Score"</span>)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>plt.scatter(age_db[y_km <span class="op">==</span><span class="dv">0</span>,<span class="dv">0</span>], age_db[y_km <span class="op">==</span> <span class="dv">0</span>,<span class="dv">1</span>], c<span class="op">=</span><span class="st">'red'</span>)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>plt.scatter(age_db[y_km <span class="op">==</span><span class="dv">1</span>,<span class="dv">0</span>], age_db[y_km <span class="op">==</span> <span class="dv">1</span>,<span class="dv">1</span>], c<span class="op">=</span><span class="st">'black'</span>)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>plt.scatter(age_db[y_km <span class="op">==</span><span class="dv">2</span>,<span class="dv">0</span>], age_db[y_km <span class="op">==</span> <span class="dv">2</span>,<span class="dv">1</span>], c<span class="op">=</span><span class="st">'blue'</span>)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>plt.scatter(age_db[y_km <span class="op">==</span><span class="dv">3</span>,<span class="dv">0</span>], age_db[y_km <span class="op">==</span> <span class="dv">3</span>,<span class="dv">1</span>], c<span class="op">=</span><span class="st">'orange'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>&lt;matplotlib.collections.PathCollection at 0x7efb8cc3b790&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-10-output-2.png" width="593" height="458"></p>
+</div>
+</div>
+<p><em>Alright, we can readily distinguish a set of individuals who maintain low spending levels, with most of them being over 30 years old. Among those under 30, we can further categorize them into two groups: those who exhibit moderate spending habits and those who are more extravagant.</em></p>
+<p>Hence, we can conclude that Customer segmentation with K-means clustering helps businesses better understand their customer base, improve customer satisfaction, and increase the effectiveness of marketing efforts by tailoring strategies to the unique needs of each segment. It’s a valuable tool for businesses in various industries, such as retail, e-commerce, finance, and more.</p>
+
+
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
