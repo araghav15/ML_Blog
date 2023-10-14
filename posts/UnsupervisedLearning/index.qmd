@@ -6,6 +6,7 @@ categories: [unsupervised, k-means, ml]
 image: "image.jpg"
 ---
 
+::: {.justify}
 
 Unsupervised learning is a type of machine learning where an algorithm is trained on a dataset without labeled outputs or target values. The primary goal of unsupervised learning is to discover the inherent structure or organization in the data. It can be used for various tasks, including:
 
@@ -208,3 +209,5 @@ plt.scatter(age_db[y_km ==3,0], age_db[y_km == 3,1], c='orange')
 *Alright, we can readily distinguish a set of individuals who maintain low spending levels, with most of them being over 30 years old. Among those under 30, we can further categorize them into two groups: those who exhibit moderate spending habits and those who are more extravagant.*
 
 Hence, we can conclude that Customer segmentation with K-means clustering helps businesses better understand their customer base, improve customer satisfaction, and increase the effectiveness of marketing efforts by tailoring strategies to the unique needs of each segment. It's a valuable tool for businesses in various industries, such as retail, e-commerce, finance, and more.
+
+:::

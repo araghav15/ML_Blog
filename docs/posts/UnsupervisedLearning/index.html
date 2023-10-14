@@ -185,6 +185,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
+<div class="justify">
 <p>Unsupervised learning is a type of machine learning where an algorithm is trained on a dataset without labeled outputs or target values. The primary goal of unsupervised learning is to discover the inherent structure or organization in the data. It can be used for various tasks, including:</p>
 <p><strong>Clustering</strong> : Unsupervised learning algorithms can group data points into clusters based on similarities or shared characteristics. K-means clustering and hierarchical clustering are common techniques used for this purpose.</p>
 <p><strong>Dimensionality Reduction</strong> : Unsupervised learning can reduce the dimensionality of data by extracting relevant features or reducing noise. Principal Component Analysis (PCA) and t-SNE (t-distributed Stochastic Neighbor Embedding) are examples of dimensionality reduction techniques.</p>
@@ -392,7 +393,7 @@ memory usage: 7.9 KB</code></pre>
 <span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>plt.scatter(income_db[y_km <span class="op">==</span><span class="dv">3</span>,<span class="dv">0</span>], income_db[y_km <span class="op">==</span> <span class="dv">3</span>,<span class="dv">1</span>],  c<span class="op">=</span><span class="st">'orange'</span>)</span>
 <span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>plt.scatter(income_db[y_km <span class="op">==</span><span class="dv">4</span>,<span class="dv">0</span>], income_db[y_km <span class="op">==</span> <span class="dv">4</span>,<span class="dv">1</span>],  c<span class="op">=</span><span class="st">'yellow'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
-<pre><code>&lt;matplotlib.collections.PathCollection at 0x7efb8befb010&gt;</code></pre>
+<pre><code>&lt;matplotlib.collections.PathCollection at 0x7f5ce5056e10&gt;</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="index_files/figure-html/cell-6-output-2.png" width="594" height="458"></p>
@@ -439,7 +440,7 @@ memory usage: 7.9 KB</code></pre>
 <span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>plt.scatter(gender_db[y_km <span class="op">==</span><span class="dv">1</span>,<span class="dv">0</span>], gender_db[y_km <span class="op">==</span> <span class="dv">1</span>,<span class="dv">1</span>], c<span class="op">=</span><span class="st">'black'</span>)</span>
 <span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>plt.scatter(gender_db[y_km <span class="op">==</span><span class="dv">2</span>,<span class="dv">0</span>], gender_db[y_km <span class="op">==</span> <span class="dv">2</span>,<span class="dv">1</span>],  c<span class="op">=</span><span class="st">'blue'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
-<pre><code>&lt;matplotlib.collections.PathCollection at 0x7efc4c2bd3d0&gt;</code></pre>
+<pre><code>&lt;matplotlib.collections.PathCollection at 0x7f5cf265ce90&gt;</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="index_files/figure-html/cell-8-output-2.png" width="593" height="458"></p>
@@ -488,7 +489,7 @@ memory usage: 7.9 KB</code></pre>
 <span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>plt.scatter(age_db[y_km <span class="op">==</span><span class="dv">2</span>,<span class="dv">0</span>], age_db[y_km <span class="op">==</span> <span class="dv">2</span>,<span class="dv">1</span>], c<span class="op">=</span><span class="st">'blue'</span>)</span>
 <span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>plt.scatter(age_db[y_km <span class="op">==</span><span class="dv">3</span>,<span class="dv">0</span>], age_db[y_km <span class="op">==</span> <span class="dv">3</span>,<span class="dv">1</span>], c<span class="op">=</span><span class="st">'orange'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
-<pre><code>&lt;matplotlib.collections.PathCollection at 0x7efb8cc3b790&gt;</code></pre>
+<pre><code>&lt;matplotlib.collections.PathCollection at 0x7f5ce5e3ae10&gt;</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="index_files/figure-html/cell-10-output-2.png" width="593" height="458"></p>
@@ -496,9 +497,10 @@ memory usage: 7.9 KB</code></pre>
 </div>
 <p><em>Alright, we can readily distinguish a set of individuals who maintain low spending levels, with most of them being over 30 years old. Among those under 30, we can further categorize them into two groups: those who exhibit moderate spending habits and those who are more extravagant.</em></p>
 <p>Hence, we can conclude that Customer segmentation with K-means clustering helps businesses better understand their customer base, improve customer satisfaction, and increase the effectiveness of marketing efforts by tailoring strategies to the unique needs of each segment. It’s a valuable tool for businesses in various industries, such as retail, e-commerce, finance, and more.</p>
-
-
 </section>
+</div>
+
+
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

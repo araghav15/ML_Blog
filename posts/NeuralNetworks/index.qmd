@@ -1,0 +1,172 @@
+---
+title: "Neural Networks"
+author: "Raghav Agrawal"
+date: "2023-10-15"
+categories: [ml, neural networks, supervised]
+image: "neuron.webp"
+---
+
+::: {.justify}
+
+Neural networks are a class of machine learning models inspired by the structure and function of the human brain. They are a subset of deep learning, a broader field of artificial intelligence. Neural networks consist of interconnected nodes, called artificial neurons, organized into layers. These layers are typically divided into three types:
+
+**Input Layer** : This layer receives the initial data or features and passes them to the next layers.
+
+**Hidden Layers** : These layers, which can be one or more, process the input data through a series of mathematical transformations, applying weights to the connections between neurons and using activation functions to introduce non-linearity. The number and structure of hidden layers can vary, depending on the network's architecture.
+
+**Output Layer** : This layer produces the final results of the neural network's computations. The output can be in various forms, depending on the task, such as a classification label, a regression value, or a sequence of values.
+
+![Neural Network](neural_network.jpg)
+
+The core concept behind neural networks is to learn from data by adjusting the weights of connections (synapses) between neurons. This learning process typically involves the following steps:
+
+*1. Forward Propagation* : The input data is fed into the network, and the network calculates an output based on the current weights and biases.
+
+*2. Loss Calculation* : The output is compared to the target and a loss function measures the difference between the predicted and actual values.
+
+*3. Backpropagation* : The network uses the calculated loss to update the weights and biases in such a way as to minimize the loss. This is done by applying optimization algorithms like gradient descent.
+
+*4. Training* : Steps 1-3 are repeated iteratively with a large dataset until the network's performance on the task improves.
+
+Once the neural network is trained, it can make predictions on new, unseen data. In this blogpost, we will understand this by building a Neural Network based on MNIST dataset, that is a widely used dataset in the field of machine learning and computer vision. It consists of a large collection of 28x28 pixel grayscale images of handwritten digits (0 through 9). 
+
+First things first, let us load the Python libraries that we need throughout the program.
+
+
+```{python}
+import warnings
+warnings.filterwarnings("ignore")
+
+import tensorflow as tf
+import seaborn as sns
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+```
+
+Since it is widely used, the MNIST dataset can be downloaded from the Tensorflow library. Let us first load the data, split it into train and test sets.
+
+
+
+```{python}
+mnist = tf.keras.datasets.mnist
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+plt.imshow(x_train[2])
+```
+
+So this is what our data looks like. Now let us see the count of each digit in our training data. 
+
+```{python}
+sns.histplot(y_train)
+```
+
+Let us now normalize out data to be between 0 and 1. 
+
+
+```{python}
+
+input_shape = (28, 28, 1)
+
+x_train=x_train.reshape(x_train.shape[0], x_train.shape[1], x_train.shape[2], 1)
+x_train=x_train / 255.0
+x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2], 1)
+x_test=x_test/255.0
+
+```
+
+Since the output is to come from a Neural Network, let us use *one hot encoding* on your output values. 
+
+
+```{python}
+y_train = tf.one_hot(y_train.astype(np.int32), depth=10)
+y_test = tf.one_hot(y_test.astype(np.int32), depth=10)
+
+```
+
+## Defining the Model
+
+
+```{python}
+batch_size = 64
+num_classes = 10
+epochs = 5
+```
+
+
+The model comprises multiple layers stacked sequentially, with the output of one layer serving as the input to the next.
+
+The Conv2D layers perform convolution operations, with each filter (32 in the initial two convolution layers and 64 in the subsequent two) processing a specific region of the image (5x5 for the first two Conv2D layers and 3x3 for the subsequent two). This transformation is applied across the entire image.
+
+MaxPool2D functions as a downsampling filter, reducing a 2x2 matrix of the image to a single pixel by selecting the maximum value within the 2x2 region. The filter's objective is to preserve the essential image features while reducing its dimensions.
+
+Dropout serves as a regularization layer, randomly excluding 25% of nodes in the layer to encourage the network to learn diverse features, thereby preventing overfitting.
+
+The 'relu' activation function, or rectifier, is employed to introduce nonlinearity into the data. It returns the input value if it's greater than or equal to 0; otherwise, it returns 0.
+
+The 'Flatten' layer transforms the tensors into a 1D vector.
+
+The 'Dense' layers constitute an artificial neural network (ANN), with the final layer providing the probabilities for each image's classification into various classes, each corresponding to a digit.
+
+Given that this model's objective is image categorization, a categorical cross-entropy loss function will be employed.
+
+
+```{python}
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Conv2D(32, (5,5), padding='same', activation='relu', input_shape=input_shape),
+    tf.keras.layers.Conv2D(32, (5,5), padding='same', activation='relu'),
+    tf.keras.layers.MaxPool2D(),
+    tf.keras.layers.Dropout(0.25),
+    tf.keras.layers.Conv2D(64, (3,3), padding='same', activation='relu'),
+    tf.keras.layers.Conv2D(64, (3,3), padding='same', activation='relu'),
+    tf.keras.layers.MaxPool2D(strides=(2,2)),
+    tf.keras.layers.Dropout(0.25),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Dense(num_classes, activation='softmax')
+])
+
+model.compile(optimizer=tf.keras.optimizers.RMSprop(epsilon=1e-08), loss='categorical_crossentropy', metrics=['acc'])
+
+```
+
+### Training the Model
+
+Finally, we need to fit the data in the model we just defined above. 
+
+```{python}
+history = model.fit(x_train, y_train,
+                    batch_size=batch_size,
+                    epochs=epochs,
+                    validation_split=0.1)
+```
+
+
+### Model Evaluation
+
+
+```{python}
+fig, ax = plt.subplots(2,1)
+ax[0].plot(history.history['loss'], color='b', label="Training Loss")
+ax[0].plot(history.history['val_loss'], color='r', label="Validation Loss",axes =ax[0])
+legend = ax[0].legend(loc='best', shadow=True)
+
+ax[1].plot(history.history['acc'], color='b', label="Training Accuracy")
+ax[1].plot(history.history['val_acc'], color='r',label="Validation Accuracy")
+legend = ax[1].legend(loc='best', shadow=True)
+```
+
+
+### Predictions
+
+
+```{python}
+test_loss, test_acc = model.evaluate(x_test, y_test)
+```
+
+As we can see, we get accuracy over 99 percent for predicting digits using a Convolutional Neural Network. 
+
+Stay tuned for further posts on improvement to our model.
+
+:::
