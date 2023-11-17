@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/RandomVariables/index.html",
       "/posts/Clustering/index.html",
       "/posts/Regression/index.html",
       "/posts/Classification/index.html",
