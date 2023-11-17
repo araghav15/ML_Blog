@@ -2,9 +2,11 @@
   {
     "listing": "/index.html",
     "items": [
-      "/posts/NeuralNetworks/index.html",
-      "/posts/UnsupervisedLearning/index.html",
-      "/posts/SupervisedLearning/index.html"
+      "/posts/Clustering/index.html",
+      "/posts/Regression/index.html",
+      "/posts/Classification/index.html",
+      "/posts/Anomaly/index.html",
+      "/posts/NeuralNetworks/index.html"
     ]
   }
 ]

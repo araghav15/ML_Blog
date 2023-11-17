@@ -1,0 +1,144 @@
+---
+title: "Classification"
+author: "Raghav Agrawal"
+date: "2023-11-15"
+categories: [ml, supervised, logistic regression]
+image: "image.jpg"
+---
+
+::: {.justify}
+
+Supervised learning is a type of machine learning where an algorithm learns from a labeled dataset, which means it is provided with input-output pairs (or examples) during training. The goal of supervised learning is to learn a mapping from input data to the corresponding output or target variable, so that the algorithm can make predictions or classify new, unseen data based on the patterns it has learned from the training data. Supervised learning is widely used in various domains, including natural language processing, computer vision, recommendation systems, and healthcare, among others, to solve a wide range of problems where the relationship between input and output can be learned from labeled data.
+
+Here are some key characteristics of supervised learning:
+
+1. **Labeled Data**: In supervised learning, you have a dataset where each data point is associated with a known output. These labels provide the ground truth for the algorithm to learn from.
+
+2. **Training Phase**: The algorithm goes through a training phase where it processes the labeled data to learn a model or function that can map input features to the correct output. The goal is to minimize the difference between the predicted outputs and the true labels.
+
+3. **Prediction**: After training, the model can be used to make predictions on new, unseen data. The model takes the input features of the new data and produces predictions or classifications based on what it has learned during training. 
+
+![Classification](classification.jpg){width="80%"}
+
+## Types of supervised learning
+
+1. **Classification**: In classification , the goal is to assign input data to one of several predefined categories or classes. For example, spam email detection is a classification task where emails are classified as either spam or not spam.
+    
+2. **Regression**: In regression tasks, the goal is to predict a continuous numerical value. For instance, predicting the price of a house based on its features like size, number of bedrooms, and location is a regression problem.
+
+
+
+Common algorithms used in supervised learning include *linear regression, logistic regression, decision trees, random forests, support vector machines*, and various types of *neural networks* like feedforward neural networks and convolutional neural networks.
+
+
+In this post, let's dive deeper into how **Logistic Regression** works.
+
+## Binary Logistic Regression
+
+Despite its name, logistic regression is used for binary classification tasks, where the goal is to predict one of two possible outcomes or classes (usually represented as 0 and 1). In order to find predicted probabilities, we use the Sigmoid function. The function maps any real value into another value between 0 and 1.
+
+![](sigmoid.png){fig-align="center" width="80%"}
+
+Let us take an example of how Logistic Regression works. In this example, we are going to work with a dataset that contains details of a bank customers and we will try to predict if a customer is eligible for a Credit Card or not.
+
+To begin with, let us import the necessary Python modules and load the dataset.
+
+```{python}
+# Importing Necessary Libraries
+import numpy as np 
+import pandas as pd 
+import matplotlib.pyplot as plt 
+%matplotlib inline
+
+# Load the Universal Bank Data
+df = pd.read_csv('bank.csv')
+df.head()
+```
+
+
+Before we train our model, we need to preprocess the data. Let us look if any feature has NULL values for all the data points.
+
+```{python}
+df.isnull().sum()
+```
+
+Since no feature has NULL or zero values, let us find other features which might not contribute in prediction. *ID* and *ZIP Code* should not ideally determine if a person is eligible for Credit Card, so we should remove them from our dataset. 
+
+```{python}
+df1 = df.drop(["ID","ZIP Code"], axis = 1)
+df1.head()
+```
+
+
+Let us now visualize the data and try to see the correlation between *Income*, *Experience* and *having a credit card* through a scatter plot.
+
+```{python}
+zero_class = df1[df1.CreditCard==0]
+one_class = df1[df1.CreditCard==1]
+
+# Income vs Experience scatter plot
+plt.xlabel('Income')
+plt.ylabel('Experience')
+plt.scatter(zero_class['Income'],zero_class['Experience'], color = 'green', marker='+')
+plt.scatter(one_class['Income'], one_class['Experience'], color = 'red', marker='.')
+```
+
+Even though the data is now clean, the values of different features are not comparable at all. Let us normalize them so that all features are brought to a similar scale or range without distorting the relative differences between their values.
+
+```{python}
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+scaled = scaler.fit(df1.drop('CreditCard',axis=1)).transform(df1.drop('CreditCard',axis=1))
+df_scaled = pd.DataFrame(scaled, columns=df1.columns[:-1])
+df_scaled.head()
+```
+
+
+Let us finally jump into building our model.
+```{python}
+# Create X and Y for the labeled data.
+x = df_scaled
+y = df1['CreditCard']
+
+# Split the dataset into train and test sections
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=0)
+
+# Train the logictic regression model
+from sklearn.linear_model import LogisticRegression
+logisticRegr = LogisticRegression()
+logisticRegr.fit(x_train,y_train)
+y_pred=logisticRegr.predict(x_test)
+
+
+# Find model accuracy
+from sklearn.metrics import accuracy_score
+print('Model accuracy : {0:0.3f}'. format(accuracy_score(y_test, y_pred)))
+
+```
+
+Finally, let us look at some metrics of our model. 
+
+```{python}
+import seaborn as sns 
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(y_test, y_pred)
+cm_matrix = pd.DataFrame(data=cm, columns=['Actual Positive:1', 'Actual Negative:0'], 
+                                 index=['Predict Positive:1', 'Predict Negative:0'])
+
+sns.heatmap(cm_matrix, annot=True, fmt='d', cmap='mako')
+```
+
+```{python}
+from sklearn.metrics import classification_report
+print(classification_report(y_test,y_pred))
+```
+
+
+The model can further be made more accurate by tuning hyperparameters, which we will look in a separate blogpost.
+
+Thank You!
+
+
+
+:::
