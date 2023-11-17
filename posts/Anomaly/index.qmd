@@ -1,0 +1,113 @@
+---
+title: "Anomaly Detection"
+author: "Raghav Agrawal"
+date: "2023-11-25"
+categories: [anomaly, outlier, ml]
+image: "image.jpg"
+---
+
+::: {.justify}
+
+In machine learning, an anomaly refers to an observation or data point that deviates significantly from the expected or normal behavior within a dataset. Anomalies are also known as outliers, novelties, or exceptions. Detecting anomalies is important in various fields, such as fraud detection, network security, manufacturing quality control, and healthcare.
+
+The process of identifying anomalies is called anomaly detection, and it involves building models or algorithms to distinguish normal patterns from abnormal ones. The definition of what is considered normal or anomalous can vary depending on the specific application and the nature of the data.
+
+Anomalies can take various forms, such as unexpected spikes or drops in numerical values, unusual patterns in time series data, or rare events in categorical data. The choice of the anomaly detection method depends on the characteristics of the data and the specific requirements of the application.
+
+
+![Anomaly](anomaly.jpg)
+
+There are various anomaly detection algorithms in machine learning, each with its strengths and weaknesses. Here are some commonly used anomaly detection algorithms:
+
+1. Isolation Forest: Isolation Forest is an algorithm that isolates anomalies by randomly selecting a feature and then randomly selecting a split value between the maximum and minimum values of the selected feature. Anomalies are likely to be isolated in fewer splits than normal instances.
+
+2. One-Class SVM (Support Vector Machine): One-Class SVM is a support vector machine algorithm that is trained only on normal data. It learns a decision boundary around normal instances, and anomalies are identified as instances lying outside this boundary.
+
+3. Local Outlier Factor (LOF):LOF measures the local density deviation of a data point with respect to its neighbors. Anomalies are identified as instances with significantly lower local density compared to their neighbors.
+
+4. Autoencoders:Autoencoders are neural networks trained to reconstruct input data. Anomalies are detected by measuring the difference between the input and the reconstructed output. Unusually high reconstruction errors indicate anomalies.
+
+5. K-Nearest Neighbors (KNN):KNN measures the distance of a data point to its k-nearest neighbors. Anomalies are identified as instances with a significantly greater average distance to their neighbors.
+
+6. Principal Component Analysis (PCA):PCA transforms the data into a lower-dimensional space, and anomalies can be identified by their distance from the 
+
+The choice of algorithm depends on the characteristics of the data and the specific requirements of the anomaly detection task. It's common to experiment with multiple algorithms to determine which one performs best for a given dataset and context.
+
+Let us look at one of the algorithms in detail.
+
+## K-Nearest Neighbors
+
+First lets import the necessari libraries. 
+
+```{python}
+
+import warnings
+warnings.filterwarnings('ignore') 
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from datetime import datetime
+
+```
+
+In this blog, we will look at anomalous data in Walmart transaction.
+Lets read the data, and look at how it is.
+
+```{python}
+walmart = pd.read_csv('walmart.csv')
+walmart.head()
+```
+
+```{python}
+walmart.info()
+```
+
+
+Now let us clean the data and extract only those fields that we need.
+```{python}
+
+walmart['Date'] = pd.to_datetime(walmart['Date'])
+walmart['Year'] = pd.to_datetime(walmart['Date']).dt.year
+walmart['Month'] = pd.to_datetime(walmart['Date']).dt.month
+#data['Week'] = pd.to_datetime(data['Date']).dt.week
+walmart['DayOfTheWeek'] = walmart['Date'].dt.dayofweek
+walmart['Day'] = pd.to_datetime(walmart['Date']).dt.day
+
+walmart_df = walmart[['Date', 'IsHoliday', 'Dept', 'Weekly_Sales',
+       'Temperature', 'Fuel_Price', 'MarkDown1', 'MarkDown2', 'MarkDown3',
+       'MarkDown4', 'MarkDown5', 'CPI', 'Unemployment', 'Type', 'Size']]
+
+
+walmart_df.set_index('Date', inplace=True)
+
+walmart_df.info()
+```
+
+Fit the data to a K-nearest neighbour model to find anomalies.
+```{python}
+X = walmart_df.values
+
+from sklearn.neighbors import NearestNeighbors
+
+nbrs = NearestNeighbors(n_neighbors = 3)
+nbrs.fit(X)
+
+distances, indexes = nbrs.kneighbors(X)
+plt.figure(figsize=(20,8))
+plt.plot(distances.mean(axis =1))
+```
+
+Plot the points to see if any data point looks like an anomaly.
+
+```{python}
+outlier_idx = np.where(distances.mean(axis = 1) > 35000)
+outlier_val = walmart.iloc[outlier_idx]
+outlier_val
+plt.figure(figsize=(20,8))
+plt.scatter(walmart_df.index,walmart_df["Weekly_Sales"] ,color = "r",alpha=0.3)
+otlr_val = walmart_df.iloc[outlier_idx]
+plt.scatter(otlr_val.index,otlr_val["Weekly_Sales"], color = "b")
+```
+:::
