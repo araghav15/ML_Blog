@@ -1,0 +1,149 @@
+---
+title: "Probability Theory and Random Variables"
+author: "Raghav Agrawal"
+date: "2023-10-01"
+categories: [probability, graussian distribution, math]
+image: "image.jpg"
+---
+
+::: {.justify}
+
+In probability theory and statistics, a random variable is a variable that can take on different values as outcomes of a random experiment or process. It represents a quantity whose value is uncertain and depends on the outcome of a random event. Random variables can be classified into two main types: discrete random variables and continuous random variables.
+
+1. **Discrete Random Variable**: A discrete random variable is one that can only take on a countable number of distinct values. The possible values of a discrete random variable can be listed individually, and there are gaps between these values. Examples include the number of heads in a series of coin tosses, the number of cars passing through a toll booth in an hour, or the number of emails received in a day.
+
+2. **Continuous Random Variable**: A continuous random variable is one that can take on any value within a certain range. The possible values of a continuous random variable form an entire range of real numbers.     Examples include the height of a person, the temperature at a specific time, or the time it takes for a computer to complete a task.
+
+Random variables can be further characterized by their probability distributions, which describe the likelihood of each possible outcome. The probability distribution of a random variable can be represented by a probability mass function (PMF) for discrete random variables or a probability density function (PDF) for continuous random variables.
+
+For a discrete random variable X, the probability mass function (PMF) is denoted as P(X = x), which gives the probability that the random variable takes on a specific value x.
+
+For a continuous random variable X, the probability density function (PDF) is denoted as f(x), and the probability that X falls within a certain interval [a, b] is given by the integral of the PDF over that interval:
+
+$P(a≤X≤b)=∫f(x)dx$
+
+Random variables are fundamental to the study of probability and statistics, and they provide a way to model and analyze uncertainty in various real-world phenomena.
+
+
+![Random Variables](random.JPG)
+
+Probability theory is a branch of mathematics that deals with the study of uncertainty and randomness. It provides a formal framework for describing and reasoning about uncertain events. Probability theory is widely used in various fields, including statistics, physics, finance, engineering, and, as previously mentioned, machine learning.
+
+Key concepts in probability theory include:
+
+**Sample Space (S)**: The set of all possible outcomes of a random experiment is called the sample space. It is denoted by SSS.
+
+**Event (E)**: An event is a subset of the sample space, representing a specific outcome or a combination of outcomes.
+
+**Probability (P)**: The probability of an event is a number between 0 and 1 that quantifies the likelihood of that event occurring. A probability of 0 indicates that the event is impossible, while a probability of 1 indicates certainty. For any event $E, 0≤P(E)≤10$
+
+**Probability Distribution**: A probability distribution describes how the probabilities are distributed over the possible outcomes in the sample space. It can be expressed through a probability mass function (PMF) for discrete random variables or a probability density function (PDF) for continuous random variables.
+
+**Conditional Probability**: The conditional probability of an event $A$ given that another event $B$ has occurred is denoted as $P(A∣B)$ and represents the probability of $A$ given the information about $B$.
+
+**Independence**: Two events $A$ and $B$ are independent if the occurrence of one event does not affect the probability of the other. Mathematically, $P(A∩B)=P(A)⋅P(B)$.
+
+**Bayes' Theorem**: Bayes' theorem is a fundamental formula in probability theory that describes the probability of an event, based on prior knowledge of conditions that might be related to the event. It is often used in Bayesian statistics and machine learning.
+
+**Expected Value (Mean)**: The expected value of a random variable is a measure of the center of its distribution. It is calculated by summing the products of each possible value and its probability.
+
+Probability theory provides a systematic and rigorous way to model uncertainty, make predictions, and analyze data in situations where outcomes are not certain. It serves as the foundation for statistical inference, decision theory, and various applications in science and engineering.
+
+## Gaussian Distribution
+The Gaussian distribution, also known as the normal distribution or bell curve, is a continuous probability distribution that is symmetrical around its mean. It is one of the most important and widely used probability distributions in statistics and probability theory. The mathematical form of the Gaussian distribution is given by the probability density function (PDF):
+
+![](gaussian.jpg)
+
+where:
+
+$x$ is a variable.
+$μ$ is the mean (average) of the distribution.
+$σ$ is the standard deviation, which measures the spread or dispersion of the distribution.
+$e$ is the base of the natural logarithm.
+
+The Gaussian distribution is characterized by the following properties:
+
+1. Symmetry: The distribution is symmetric around its mean (μ\muμ).
+    
+2. Bell-Shaped Curve: The probability density function forms a bell-shaped curve, with the peak at the mean.
+   
+2. Mean, Median, and Mode are Equal: In a normal distribution, the mean, median, and mode are all located at the center of the distribution.
+  
+3. 68-95-99.7 Rule (Empirical Rule): Approximately 68% of the data falls within one standard deviation of the mean, 95% within two standard deviations, and 99.7% within three standard deviations.
+
+4. Infinitely Extensible Tails: The tails of the distribution extend infinitely in both directions, but the probability of values far from the mean becomes extremely small.
+
+The Gaussian distribution arises naturally in many real-world phenomena, and it is a key assumption in various statistical methods and machine learning algorithms. For instance, the central limit theorem states that the sum (or average) of a large number of independent, identically distributed random variables approaches a normal distribution, regardless of the shape of the original distribution.
+
+
+Now, let us analyze some random data and see if it follow normal distribution. 
+
+```{python}
+import warnings
+warnings.filterwarnings("ignore")
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from scipy.stats import norm
+
+# for box plot
+import plotly.offline as py
+py.init_notebook_mode(connected=True)
+import plotly.graph_objects as go
+```
+
+
+Read the data of heights and weights.
+```{python}
+heightWeight = pd.read_csv("HeightWeight.csv")
+heightWeight.info()
+```
+
+Let us just analyze the weights.
+```{python}
+data = heightWeight.iloc[:, 2].values
+```
+
+What is the mean and standard deviation!!
+```{python}
+mean = data.mean()
+print(mean)
+
+std = data.std()
+print(std)
+```
+
+Let us not try to plot this and see if it matches guassian distribution.
+```{python}
+plt.figure(figsize=(12,8))
+plt.hist(data, bins=25, density=True, alpha=0.6, color='#51613f')
+
+xmin, xmax = plt.xlim()
+x = np.linspace(xmin, xmax, 100)
+probability_density = norm.pdf(x, mean, std)
+
+plt.plot(x, probability_density, linewidth=3, color='red')
+
+plt.xlabel('Data points')
+plt.ylabel('Probability Density')
+plt.title('Normal Distributions', fontsize=16)
+
+```
+
+Let us get a boxplot for our data.
+```{python}
+fig = go.Figure()
+fig.add_trace(go.Box(
+    y=data,
+    name='mean & std',
+    marker_color='#51613f',
+    boxmean='sd'
+))
+
+fig.show()
+
+```
+
+:::
